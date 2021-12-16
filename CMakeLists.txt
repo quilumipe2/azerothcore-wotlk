@@ -79,7 +79,7 @@ CU_RUN_HOOK("AFTER_LOAD_CONF")
 
 # build in Release-mode by default if not explicitly set
 if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+    set(CMAKE_BUILD_TYPE "Release")
 endif()
 
 # turn off PCH totally if enabled (hidden setting, mainly for devs)
