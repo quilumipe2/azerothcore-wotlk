@@ -751,8 +751,8 @@ void ObjectMgr::LoadCreatureTemplateAddons()
         creatureAddon.visibilityDistanceType = VisibilityDistanceType(fields[6].GetUInt8());
 
         Tokenizer tokens(fields[7].GetString(), ' ');
-        uint8 i = 0;
-        creatureAddon.auras.resize(tokens.size());
+
+        creatureAddon.auras.reserve(tokens.size());
         for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
         {
             SpellInfo const* AdditionalSpellInfo = sSpellMgr->GetSpellInfo(uint32(atol(*itr)));
@@ -761,7 +761,14 @@ void ObjectMgr::LoadCreatureTemplateAddons()
                 LOG_ERROR("sql.sql", "Creature (Entry: %u) has wrong spell %u defined in `auras` field in `creature_template_addon`.", entry, uint32(atol(*itr)));
                 continue;
             }
-            creatureAddon.auras[i++] = uint32(atol(*itr));
+
+            if (AdditionalSpellInfo->GetDuration() > 0)
+            {
+                LOG_DEBUG/*ERROR*/("sql.sql", "Creature (Entry: %u) has temporary aura (spell %u) in `auras` field in `creature_template_addon`.", entry, uint32(atol(*itr)));
+                // continue;
+            }
+
+            creatureAddon.auras.push_back(atol(*itr));
         }
 
         if (creatureAddon.mount)
@@ -1181,8 +1188,8 @@ void ObjectMgr::LoadCreatureAddons()
         creatureAddon.visibilityDistanceType = VisibilityDistanceType(fields[6].GetUInt8());
 
         Tokenizer tokens(fields[7].GetString(), ' ');
-        uint8 i = 0;
-        creatureAddon.auras.resize(tokens.size());
+
+        creatureAddon.auras.reserve(tokens.size());
         for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
         {
             SpellInfo const* AdditionalSpellInfo = sSpellMgr->GetSpellInfo(uint32(atol(*itr)));
@@ -1191,7 +1198,14 @@ void ObjectMgr::LoadCreatureAddons()
                 LOG_ERROR("sql.sql", "Creature (GUID: %u) has wrong spell %u defined in `auras` field in `creature_addon`.", guid, uint32(atol(*itr)));
                 continue;
             }
-            creatureAddon.auras[i++] = uint32(atol(*itr));
+
+            if (AdditionalSpellInfo->GetDuration() > 0)
+            {
+                LOG_DEBUG/*ERROR*/("sql.sql", "Creature (Entry: %u) has temporary aura (spell %u) in `auras` field in `creature_template_addon`.", guid, uint32(atol(*itr)));
+                // continue;
+            }
+
+            creatureAddon.auras.push_back(atol(*itr));
         }
 
         if (creatureAddon.mount)
@@ -4639,7 +4653,7 @@ void ObjectMgr::LoadQuests()
         {
             if (qinfo->RewardFactionId[j])
             {
-                if (abs(qinfo->RewardFactionValueId[j]) > 9)
+                if (std::abs(qinfo->RewardFactionValueId[j]) > 9)
                 {
                     LOG_ERROR("sql.sql", "Quest %u has RewardFactionValueId%d = %i. That is outside the range of valid values (-9 to 9).", qinfo->GetQuestId(), j + 1, qinfo->RewardFactionValueId[j]);
                 }
@@ -4749,7 +4763,7 @@ void ObjectMgr::LoadQuests()
         // fill additional data stores
         if (qinfo->PrevQuestId)
         {
-            if (_questTemplates.find(abs(qinfo->GetPrevQuestId())) == _questTemplates.end())
+            if (_questTemplates.find(std::abs(qinfo->GetPrevQuestId())) == _questTemplates.end())
             {
                 LOG_ERROR("sql.sql", "Quest %d has PrevQuestId %i, but no such quest", qinfo->GetQuestId(), qinfo->GetPrevQuestId());
             }
