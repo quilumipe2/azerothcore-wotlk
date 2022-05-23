@@ -406,7 +406,7 @@ public:
                 me->CastSpell(me, SPELL_AWARD_REPUTATION_BOSS_KILL, true);
                 // this display id was found in sniff instead of the one on aura
                 me->SetDisplayId(11686);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->DespawnOrUnsummon(4000);
                 if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_LICH_KING)))
                     lichKing->CastSpell(lichKing, SPELL_SPAWN_CHEST, false);
@@ -592,7 +592,7 @@ public:
             {
                 checkTimer = 3000;
                 me->SetInCombatWithZone();
-                ThreatContainer::StorageType const& threatList = me->getThreatMgr().getThreatList();
+                ThreatContainer::StorageType const& threatList = me->GetThreatMgr().getThreatList();
                 if (!threatList.empty())
                     for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
                         if (Unit* target = (*itr)->getTarget())
@@ -859,7 +859,7 @@ public:
 
         void AttackStart(Unit*) override {}
         void MoveInLineOfSight(Unit*) override {}
-        void EnterEvadeMode() override {}
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
 
         void UpdateAI(uint32 diff) override
         {
@@ -1049,7 +1049,7 @@ public:
                 {
                     timer = 0;
                     me->SetDisplayId(11686);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->DespawnOrUnsummon(2000);
                 }
                 else
@@ -1158,7 +1158,7 @@ public:
             float startAngle = 3 * M_PI / 2;
             float maxAddAngle = ((target->GetMap()->GetSpawnMode() % 2) == 0 ? M_PI : 2 * M_PI);
             float angle = startAngle + rand_norm() * maxAddAngle;
-            target->CastSpell(target->GetPositionX() + cos(angle)*dist, target->GetPositionY() + sin(angle)*dist, target->GetPositionZ(), spellId, true);
+            target->CastSpell(target->GetPositionX() + cos(angle)*dist, target->GetPositionY() + std::sin(angle)*dist, target->GetPositionZ(), spellId, true);
         }
 
         void Register() override

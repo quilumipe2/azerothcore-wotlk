@@ -179,7 +179,7 @@ public:
                 for (uint8 j = 0; j < 8; ++j)
                 {
                     float angle = M_PI * 2 / 8 * j;
-                    me->SummonCreature(NPC_SOLDIER_OF_THE_FROZEN_WASTES, SummonGroups[i].GetPositionX() + 6 * cos(angle), SummonGroups[i].GetPositionY() + 6 * sin(angle), SummonGroups[i].GetPositionZ(), SummonGroups[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    me->SummonCreature(NPC_SOLDIER_OF_THE_FROZEN_WASTES, SummonGroups[i].GetPositionX() + 6 * cos(angle), SummonGroups[i].GetPositionY() + 6 * std::sin(angle), SummonGroups[i].GetPositionZ(), SummonGroups[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 }
             }
             for (uint8 i = 6; i < 12; ++i)
@@ -188,7 +188,7 @@ public:
                 {
                     float dist = j == 2 ? 0.0f : 8.0f; // second in middle
                     float angle = SummonGroups[i].GetOrientation() + M_PI * 2 / 4 * j;
-                    me->SummonCreature(NPC_UNSTOPPABLE_ABOMINATION, SummonGroups[i].GetPositionX() + dist * cos(angle), SummonGroups[i].GetPositionY() + dist * sin(angle), SummonGroups[i].GetPositionZ(), SummonGroups[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    me->SummonCreature(NPC_UNSTOPPABLE_ABOMINATION, SummonGroups[i].GetPositionX() + dist * cos(angle), SummonGroups[i].GetPositionY() + dist * std::sin(angle), SummonGroups[i].GetPositionZ(), SummonGroups[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 }
             }
             for (uint8 i = 6; i < 12; ++i)
@@ -196,7 +196,7 @@ public:
                 for (uint8 j = 0; j < 1; ++j)
                 {
                     float angle = SummonGroups[i].GetOrientation() + M_PI;
-                    me->SummonCreature(NPC_SOUL_WEAVER, SummonGroups[i].GetPositionX() + 6 * cos(angle), SummonGroups[i].GetPositionY() + 6 * sin(angle), SummonGroups[i].GetPositionZ() + 0.5f, SummonGroups[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    me->SummonCreature(NPC_SOUL_WEAVER, SummonGroups[i].GetPositionX() + 6 * cos(angle), SummonGroups[i].GetPositionY() + 6 * std::sin(angle), SummonGroups[i].GetPositionZ() + 0.5f, SummonGroups[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 }
             }
         }
@@ -221,7 +221,7 @@ public:
             BossAI::Reset();
             events.Reset();
             summons.DespawnAll();
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
             me->SetReactState(REACT_AGGRESSIVE);
             if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_FLOOR)))
             {
@@ -254,10 +254,10 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
-            ScriptedAI::EnterEvadeMode();
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void KilledUnit(Unit* who) override
@@ -300,7 +300,7 @@ public:
         {
             BossAI::EnterCombat(who);
             Talk(SAY_SUMMON_MINIONS);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
             me->RemoveAllAttackers();
             me->SetTarget();
             me->SetReactState(REACT_PASSIVE);
@@ -383,7 +383,7 @@ public:
                     Talk(SAY_AGGRO);
                     events.Reset();
                     summons.DoAction(ACTION_SECOND_PHASE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
                     me->RemoveAura(SPELL_KELTHUZAD_CHANNEL);
                     me->SetReactState(REACT_AGGRESSIVE);
@@ -438,7 +438,7 @@ public:
                 case EVENT_DETONATE_MANA:
                     {
                         std::vector<Unit*> unitList;
-                        ThreatContainer::StorageType const& threatList = me->getThreatMgr().getThreatList();
+                        ThreatContainer::StorageType const& threatList = me->GetThreatMgr().getThreatList();
                         for (auto itr : threatList)
                         {
                             if (itr->getTarget()->GetTypeId() == TYPEID_PLAYER
@@ -505,7 +505,7 @@ public:
                     }
                     break;
             }
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+            if (!me->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
                 DoMeleeAttackIfReady();
         }
     };
@@ -554,8 +554,8 @@ public:
             }
             if (param == ACTION_GUARDIANS_OFF)
             {
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->RemoveAllAuras();
                 EnterEvadeMode();
                 me->SetPosition(me->GetHomePosition());

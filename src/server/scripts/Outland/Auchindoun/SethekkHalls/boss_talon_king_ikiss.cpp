@@ -199,7 +199,7 @@ public:
         boss_anzuAI(Creature* creature) : ScriptedAI(creature), summons(me)
         {
             talkTimer = 1;
-            me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE);
             me->AddAura(SPELL_SHADOWFORM, me);
         }
 
@@ -253,7 +253,7 @@ public:
             Talk(SAY_SUMMON);
             me->CastSpell(me, SPELL_BANISH_SELF, true);
             for (uint8 i = 0; i < 5; ++i)
-                me->SummonCreature(23132 /*NPC_BROOD_OF_ANZU*/, me->GetPositionX() + 20 * cos((float)i), me->GetPositionY() + 20 * sin((float)i), me->GetPositionZ() + 25.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                me->SummonCreature(23132 /*NPC_BROOD_OF_ANZU*/, me->GetPositionX() + 20 * cos((float)i), me->GetPositionY() + 20 * std::sin((float)i), me->GetPositionZ() + 25.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
         }
 
         void UpdateAI(uint32 diff) override
@@ -268,7 +268,7 @@ public:
                 }
                 else if (talkTimer >= 16000)
                 {
-                    me->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                    me->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                     me->RemoveAurasDueToSpell(SPELL_SHADOWFORM);
                     Talk(SAY_ANZU_INTRO2);
                     talkTimer = 0;

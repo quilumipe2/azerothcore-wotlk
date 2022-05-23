@@ -49,7 +49,7 @@ public:
                 me->Respawn();
                 me->UpdateEntry(NPC_BROKEN_KEEP_CANNON, nullptr, false);
                 me->RemoveVehicleKit();
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                me->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
             }
         }
 
@@ -61,7 +61,7 @@ public:
                 if (faction)
                     me->SetFaction(faction);
                 me->CreateVehicleKit(510, NPC_KEEP_CANNON);
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
                 events.ScheduleEvent(EVENT_RESTORE_FLAG, 4000);
             }
         }
@@ -72,7 +72,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_RESTORE_FLAG:
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
                     break;
             }
 
@@ -477,7 +477,7 @@ public:
 
                 float dist = position->GetExactDist2d(player->GetPositionX(), player->GetPositionY());
                 float elevation = GetSpell()->m_targets.GetElevation();
-                float speedZ = std::max(10.0f, float(50.0f * sin(elevation)));
+                float speedZ = std::max(10.0f, float(50.0f * std::sin(elevation)));
                 float speedXY = dist * 10.0f / speedZ;
 
                 player->GetMotionMaster()->MoveJump(position->GetPositionX(), position->GetPositionY(), position->GetPositionZ(), speedXY, speedZ);
